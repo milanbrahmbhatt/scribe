@@ -399,11 +399,12 @@ bool scribeHandler::notifyHub(const LogEntry& entry) {
   time(&now); 
   char value[20];
   sprintf(value, "%lu:Forwarded",now);
-  if (entry.traceId.empty()) {
-    entry.traceId="-1"; // default traceId
+  std:string traceId = entry.traceId;
+  if (traceId.empty()) {
+    traceId="-1"; // default traceId
   }
   LOG_OPER("publishing to hub <%s:%lu> => key=%s_%s value=%s", 
-    hubHost.c_str(), hubPort, entry.traceId.c_str(), pubType.c_str(), value);
+    hubHost.c_str(), hubPort, traceId.c_str(), pubType.c_str(), value);
   return true;
 }
 
