@@ -399,7 +399,7 @@ bool scribeHandler::notifyHub(const LogEntry& entry) {
   time(&now); 
   char value[20];
   sprintf(value, "%lu:Forwarded",now);
-  LOG_OPER("publishing to hub <%s:%lu> => key=%s_%s value=%s", hubHost, hubPort, entry.traceId, hubType, value);
+  LOG_OPER("publishing to hub <%s:%lu> => key=%s_%s value=%s", hubHost, hubPort, entry.traceId, pubType, value);
   return true;
 }
 
@@ -615,19 +615,19 @@ void scribeHandler::initialize() {
     // hub type of memcached is supported. 
     config.getString("pub_type", pubType);
     if (pubType.empty()) {
-      pubType = "scribe"
+      pubType = "scribe";
     }
     LOG_OPER("pub_type initialized to %s", pubType);
 
     config.getString("hub_host", hubHost);
     if (hubHost.empty()) {
-      hubHost = "localhost"
+      hubHost = "localhost";
     }
     LOG_OPER("hub_host initialized to %s", hubHost);
 
     config.getUnsigned("hub_port", hubPort);
     if (hubPort <= 0) {
-      throw runtime_error("No hub_port number configured");
+      hubPort = 11211;
     }
     LOG_OPER("hub_port initialized to %lu", hubPort);
 
