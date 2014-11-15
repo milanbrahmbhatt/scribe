@@ -35,17 +35,20 @@ class LogEntry:
   Attributes:
    - category
    - message
+   - traceId
   """
 
   thrift_spec = (
     None, # 0
     (1, TType.STRING, 'category', None, None, ), # 1
     (2, TType.STRING, 'message', None, None, ), # 2
+    (2, TType.STRING, 'traceId', None, None, ), # 2
   )
 
-  def __init__(self, category=None, message=None,):
+  def __init__(self, category=None, message=None, traceId=None,):
     self.category = category
     self.message = message
+    self.traceId = traceId
 
   def read(self, iprot):
     if iprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None and fastbinary is not None:
@@ -84,6 +87,9 @@ class LogEntry:
       oprot.writeFieldBegin('message', TType.STRING, 2)
       oprot.writeString(self.message)
       oprot.writeFieldEnd()
+    if self.message != None:
+      oprot.writeFieldBegin('traceId', TType.STRING, 3)
+      oprot.writeString(self.traceId)
     oprot.writeFieldStop()
     oprot.writeStructEnd()
 
