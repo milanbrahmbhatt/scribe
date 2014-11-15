@@ -384,6 +384,9 @@ void scribeHandler::addMessage(
     (*store_iter)->addMessage(ptr);
   }
 
+  //notify hub TODO do we want to notifyHub per store? 
+  notifyHub(entry);
+
   if (numstores) {
     incCounter(entry.category, "received good");
   } else {
@@ -391,6 +394,14 @@ void scribeHandler::addMessage(
   }
 }
 
+bool scribeHandler::notifyHub(const LogEntry& entry) {
+  time_t now;
+  time(&now); 
+  char value[20];
+  sprintf(value, "%d:Forwarded",now);
+  LOG_OPER("publishing to hub <%s:%lu> => key=%s_%s value=%s", entry.traceId, hubType, value);
+  return true;
+}
 
 ResultCode scribeHandler::Log(const vector<LogEntry>&  messages) {
   ResultCode result = TRY_LATER;
@@ -418,6 +429,8 @@ ResultCode scribeHandler::Log(const vector<LogEntry>&  messages) {
 
     shared_ptr<store_list_t> store_list;
     string category = (*msg_iter).category;
+
+    
 
     category_map_t::iterator cat_iter;
     // First look for an exact match of the category
@@ -598,6 +611,25 @@ void scribeHandler::initialize() {
       }
     }
 
+    // hub type, host name, port to send waypoint data.  At the moment only
+    // hub type of memcached is supported. 
+    config.getString("pub_type", pubType);
+    if (pubType.empty()) {
+      pubType = "scribe"
+    }
+    LOG_OPER("pub_type initialized to %s", pubType);
+
+    config.getString("hub_host", hubHost);
+    if (hubHost.empty()) {
+      hubHost = "localhost"
+    }
+    LOG_OPER("hub_host initialized to %s", hubHost);
+
+    config.getUnsigned("hub_port", hubPort);
+    if (hubPort <= 0) {
+      throw runtime_error("No hub_port number configured");
+    }
+    LOG_OPER("hub_port initialized to %lu", hubPort);
 
     // Build a new map of stores, and move stores from the old map as
     // we find them in the config file. Any stores left in the old map

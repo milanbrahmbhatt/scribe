@@ -32,7 +32,8 @@ enum ResultCode
 struct LogEntry
 {
   1:  string category,
-  2:  string message
+  2:  string message,
+  3:  string traceId
 }
 
 service scribe extends fb303.FacebookService

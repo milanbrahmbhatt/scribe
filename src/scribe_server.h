@@ -101,6 +101,11 @@ class scribeHandler : virtual public scribe::thrift::scribeIf,
   StoreConf config;
   bool newThreadPerCategory;
 
+  // pubhub settings
+  std::string pubType;
+  std::string hubHost;
+  unsigned long hubPort; // long because it works with config code
+
   /* mutex to syncronize access to scribeHandler.
    * A single mutex is fine since it only needs to be locked in write mode
    * during start/stop/reinitialize or when we need to create a new category.
@@ -131,6 +136,7 @@ class scribeHandler : virtual public scribe::thrift::scribeIf,
     createNewCategory(const std::string& category);
   void addMessage(const scribe::thrift::LogEntry& entry,
                   const boost::shared_ptr<store_list_t>& store_list);
+  bool notifyHub(const scribe::thrift::LogEntry& entry);
 };
 extern boost::shared_ptr<scribeHandler> g_Handler;
 #endif // SCRIBE_SERVER_H
