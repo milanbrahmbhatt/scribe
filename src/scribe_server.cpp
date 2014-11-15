@@ -397,15 +397,31 @@ void scribeHandler::addMessage(
 bool scribeHandler::notifyHub(const LogEntry& entry) {
   time_t now;
   time(&now); 
-  char value[20];
-  sprintf(value, "%lu:Forwarded",now);
+
   std:string traceId = entry.traceId;
   if (traceId.empty()) {
     traceId="-1"; // default traceId
   }
-  LOG_OPER("publishing to hub <%s:%lu> => key=%s_%s value=%s", 
-    hubHost.c_str(), hubPort, traceId.c_str(), pubType.c_str(), value);
-  return true;
+
+  char key[strlen(traceId)+1+strlen(pubType)];
+  sprintf(key, "%s_%s",traceId, pubType;
+
+  char value[20];  
+  sprintf(value, "%lu:Forwarded",now);
+  
+  // set it in memcache
+  memcached_return rc = memcached_set(memc, key, strlen(key), value, 
+    strlen(value), (time_t)0, (uint32_t)0);
+
+  if (rc == MEMCACHED_SUCCESS) {
+    LOG_OPER("Successfully published to hub <%s:%lu> => key=%s value=%s", hubHost.c_str(), hubPort, key, value);
+    incCounter(entry.category, "pub hub success");
+    return true;
+  } else {
+    LOG_OPER("Publish to hub failed <%s:%lu> => key=%s value=%s", hubHost.c_str(), hubPort, key, value);
+    incCounter(entry.category, "pub hub failure");
+    return false;
+  }  
 }
 
 ResultCode scribeHandler::Log(const vector<LogEntry>&  messages) {
@@ -616,8 +632,7 @@ void scribeHandler::initialize() {
       }
     }
 
-    // hub type, host name, port to send waypoint data.  At the moment only
-    // hub type of memcached is supported. 
+    // pub type, host name, port to send waypoint data.
     config.getString("pub_type", pubType);
     if (pubType.empty()) {
       pubType = "scribe";
@@ -635,6 +650,19 @@ void scribeHandler::initialize() {
       hubPort = 11211;
     }
     LOG_OPER("hub_port initialized to %lu", hubPort);
+
+    //setup/initialize client for the hub
+    hubServers = NULL;
+    memc = memcached_create(NULL);
+    memcached_return rc;
+    servers = memcached_server_list_append(servers, hubHost, hubPort, &rc);
+    rc = memcached_server_push(memc, servers);
+    if (rc == MEMCACHED_SUCCESS) {
+      LOG_OPER("hub host successfully added <%s:%lu>", hubHost, hubPort);
+    } else {
+      LOG_OPER("Unable to add hub host successfully <%s:%lu> error <%s>", 
+        hubHost, hubPort, memcached_strerror(memc, rc));      
+    }
 
     // Build a new map of stores, and move stores from the old map as
     // we find them in the config file. Any stores left in the old map

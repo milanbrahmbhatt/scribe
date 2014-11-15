@@ -105,7 +105,9 @@ class scribeHandler : virtual public scribe::thrift::scribeIf,
   std::string pubType;
   std::string hubHost;
   unsigned long hubPort; // long because it works with config code
-
+  memcached_server_st* hubServers;
+  memcached_st *memc;
+  
   /* mutex to syncronize access to scribeHandler.
    * A single mutex is fine since it only needs to be locked in write mode
    * during start/stop/reinitialize or when we need to create a new category.
