@@ -403,8 +403,7 @@ bool scribeHandler::notifyHub(const LogEntry& entry) {
     entry.traceId="-1"; // default traceId
   }
   LOG_OPER("publishing to hub <%s:%lu> => key=%s_%s value=%s", 
-    hubHost.c_str(), hubPort, entry.traceId.c_str(), pubType.c_str(), 
-    value.c_str());
+    hubHost.c_str(), hubPort, entry.traceId.c_str(), pubType.c_str(), value);
   return true;
 }
 
@@ -622,13 +621,13 @@ void scribeHandler::initialize() {
     if (pubType.empty()) {
       pubType = "scribe";
     }
-    LOG_OPER("pub_type initialized to %s", pubType);
+    LOG_OPER("pub_type initialized to %s", pubType.c_str());
 
     config.getString("hub_host", hubHost);
     if (hubHost.empty()) {
       hubHost = "localhost";
     }
-    LOG_OPER("hub_host initialized to %s", hubHost);
+    LOG_OPER("hub_host initialized to %s", hubHost.c_str());
 
     config.getUnsigned("hub_port", hubPort);
     if (hubPort <= 0) {
