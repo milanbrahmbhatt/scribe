@@ -398,7 +398,7 @@ bool scribeHandler::notifyHub(const LogEntry& entry) {
   time_t now;
   time(&now); 
   char value[20];
-  sprintf(value, "%d:Forwarded",now);
+  sprintf(value, "%lu:Forwarded",now);
   LOG_OPER("publishing to hub <%s:%lu> => key=%s_%s value=%s", entry.traceId, hubType, value);
   return true;
 }
