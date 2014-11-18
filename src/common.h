@@ -42,11 +42,12 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include <libmemcached/memcached.h>
+
 #include <boost/version.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/convenience.hpp>
-#include <libmemcached/memcached.h>
 
 // For security reasons we can't release everything that's compiled
 // in at facebook. Other users might find this useful as well for

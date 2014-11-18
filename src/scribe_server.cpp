@@ -398,13 +398,13 @@ bool scribeHandler::notifyHub(const LogEntry& entry) {
   time_t now;
   time(&now); 
 
-  std:string traceId = entry.traceId;
+  std::string traceId = entry.traceId;
   if (traceId.empty()) {
-    traceId="-1"; // default traceId
+    return true;
   }
 
-  char key[strlen(traceId)+1+strlen(pubType)];
-  sprintf(key, "%s_%s",traceId, pubType;
+  char key[traceId.size()+1+pubType.size()];
+  sprintf(key, "%s_%s",traceId.c_str(), pubType.c_str());
 
   char value[20];  
   sprintf(value, "%lu:Forwarded",now);
@@ -655,13 +655,13 @@ void scribeHandler::initialize() {
     hubServers = NULL;
     memc = memcached_create(NULL);
     memcached_return rc;
-    servers = memcached_server_list_append(servers, hubHost, hubPort, &rc);
-    rc = memcached_server_push(memc, servers);
+    hubServers = memcached_server_list_append(hubServers, hubHost.c_str(), hubPort, &rc);
+    rc = memcached_server_push(memc, hubServers);
     if (rc == MEMCACHED_SUCCESS) {
-      LOG_OPER("hub host successfully added <%s:%lu>", hubHost, hubPort);
+      LOG_OPER("hub host successfully added <%s:%lu>", hubHost.c_str(), hubPort);
     } else {
       LOG_OPER("Unable to add hub host successfully <%s:%lu> error <%s>", 
-        hubHost, hubPort, memcached_strerror(memc, rc));      
+        hubHost.c_str(), hubPort, memcached_strerror(memc, rc));      
     }
 
     // Build a new map of stores, and move stores from the old map as

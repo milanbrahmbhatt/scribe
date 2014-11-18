@@ -53,7 +53,7 @@ endif
 
 # Set libraries external to this component.
 EXTERNAL_LIBS = -L$(thrift_home)/lib -L$(fb303_home)/lib -L$(hadoop_home)/lib -lfb303 -lthrift -lthriftnb
-EXTERNAL_LIBS += -levent -lpthread -lmemcached
+EXTERNAL_LIBS += -levent -lpthread -L/usr/local/lib -lmemcached
 if USE_SCRIBE_HDFS
   EXTERNAL_LIBS += -lhdfs -ljvm
 endif
@@ -69,11 +69,8 @@ AM_CPPFLAGS += -I$(thrift_home)/include/thrift
 AM_CPPFLAGS += -I$(fb303_home)/include/thrift
 AM_CPPFLAGS += -I$(fb303_home)/include/thrift/fb303
 AM_CPPFLAGS += -I$(hadoop_home)/include
-AM_CPPFLAGS += -I/usr/local/include/libmemcached
-AM_CPPFLAGS += -I/usr/local/include/libmemcached-1.0
 AM_CPPFLAGS += $(BOOST_CPPFLAGS)
 AM_CPPFLAGS += $(FB_CPPFLAGS) $(DEBUG_CPPFLAGS)
-
 
 AM_LDFLAGS = $(BOOST_LDFLAGS) $(BOOST_SYSTEM_LIB) $(BOOST_FILESYSTEM_LIB)
 
